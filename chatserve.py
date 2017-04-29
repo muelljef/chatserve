@@ -1,9 +1,18 @@
 from socket import *
+import signal
+import sys
+
+def signal_handler(signal, frame):
+    serverSocket.close()
+    print('You pressed Ctrl+C')
+    sys.exit(0)
+signal.signal(signal.SIGINT, signal_handler)
 
 serverName = 'localhost'
 serverPort = 50517
 
 serverSocket = socket(AF_INET, SOCK_STREAM)
+serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 serverSocket.bind(('', serverPort))
 serverSocket.listen(1)
 
@@ -30,7 +39,7 @@ while 1:
         # check if the server wants to quit the connection
         if myMessage == "\quit":
             print "closing connection"
-            break;
+            break
 
         # send the message to the client
         myMessage = serverHandle + '>' + myMessage
