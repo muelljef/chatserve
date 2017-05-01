@@ -5,8 +5,11 @@ https://www.tutorialspoint.com/python/python_command_line_arguments.htm
 http://stackoverflow.com/questions/12371361/using-variables-in-signal-handler-require-global
 // socket programming
 http://www.binarytides.com/python-socket-programming-tutorial/
-// Need the link for making the port available right away
-
+// Link for solution to make socket available right away
+http://stackoverflow.com/questions/27360218/how-to-close-socket-connection-on-ctrl-c-in-a-python-programme
 
 C
 // OSU Operating Systems course covers strings and socket API. Utilized code from last project from socekts API
+
+
+gcc -o chatclient main.c
