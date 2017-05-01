@@ -1,0 +1,12 @@
+python
+// for example with arguments
+https://www.tutorialspoint.com/python/python_command_line_arguments.htm
+// for example with registering sigint handler
+http://stackoverflow.com/questions/12371361/using-variables-in-signal-handler-require-global
+// socket programming
+http://www.binarytides.com/python-socket-programming-tutorial/
+// Need the link for making the port available right away
+
+
+C
+// OSU Operating Systems course covers strings and socket API. Utilized code from last project from socekts API
