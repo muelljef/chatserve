@@ -44,7 +44,7 @@ def startUp():
     # Setting a SIG INT or Ctrl + C handler to close the server socket on exit
     def signal_handler(*args):
         serverSocket.close()
-        print 'chatserve closing'
+        print '\nchatserve closing'
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
 
