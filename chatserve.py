@@ -35,6 +35,7 @@ while 1:
 
         # get the message from the server
         myMessage = raw_input(serverHandle + '>')
+        myMessage = myMessage[:500]
 
         # check if the server wants to quit the connection
         if myMessage == "\quit":
