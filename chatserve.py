@@ -1,65 +1,82 @@
+#!/usr/bin/python
 from socket import *
 import signal
 import sys
 
 # Setting a SIG INT or Ctrl + C handler to close the server socket on exit
-def signal_handler(signal, frame):
-    serverSocket.close()
-    print('You pressed Ctrl+C')
-    sys.exit(0)
-signal.signal(signal.SIGINT, signal_handler)
 
-# Get the port number from the user
-try:
-    serverPort = int(raw_input('Enter the port number to serve on: '))
-except ValueError:
-    print 'Invalid port number'
-    sys.exit(1)
-if serverPort < 1 or serverPort > 65535:
-    print 'Invalid port number'
-    sys.exit(1)
+def startUp():
+    # Get the port number from the user
+    serverPort = 50123
 
-# Setup the server connection on the given port number
-try:
-    serverSocket = socket(AF_INET, SOCK_STREAM)
-    serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-    serverSocket.bind(('', serverPort))
-    serverSocket.listen(1)
-except:
-    print 'Failed to bind the port'
-    sys.exit(1)
-print 'Listening for connections on port ' + str(serverPort) + '\n'
+    # Setup the server connection on the given port number
+    try:
+        serverSocket = socket(AF_INET, SOCK_STREAM)
+        serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        serverSocket.bind(('', serverPort))
+        serverSocket.listen(1)
+    except:
+        print 'Failed to bind the port'
+        sys.exit(1)
+    print 'Listening for connections on port ' + str(serverPort) + '\n'
 
-# hard coded server handle
-serverHandle = 'ServeO'
+    # Set the signal handler for sig int
+    def signal_handler(*args):
+        serverSocket.close()
+        print 'chatserve closing'
+        sys.exit(0)
+    signal.signal(signal.SIGINT, signal_handler)
 
-# listen for connection
-while 1:
-    connectionSocket, addr = serverSocket.accept()
+    # hard coded server handle
+    serverHandle = 'ServeO'
+    return serverSocket, serverHandle
 
-    # connection made, loop for conversation
+
+def sendMessage(connectionSocket, serverHandle):
+    # get the message from the server
+    myMessage = raw_input(serverHandle + '>')
+    myMessage = myMessage[:500]
+
+    # check if the server wants to quit the connection
+    if myMessage == "\quit":
+        return False
+
+    # send the message to the client
+    myMessage = serverHandle + '>' + myMessage
+    connectionSocket.send(myMessage)
+    return True
+
+
+def receiveMessage(connectionSocket):
+    # read the client message
+    peerMessage = connectionSocket.recv(1024)
+
+    # check if client closed the connection, if not print the message to screen
+    if not peerMessage:
+        return False
+    print peerMessage
+    return True
+
+
+def main(argv):
+    serverSocket, serverHandle = startUp()
+
+    # listen for connection
     while 1:
-        # read the client message
-        peerMessage = connectionSocket.recv(1024)
+        connectionSocket, addr = serverSocket.accept()
 
-        # check if client closed the connection, if not print the message to screen
-        if not peerMessage:
-            "client closed connection"
-            break
-        print peerMessage
+        # connection made, loop for conversation
+        while 1:
+            if not receiveMessage(connectionSocket):
+                print "Client closed connection"
+                break
 
-        # get the message from the server
-        myMessage = raw_input(serverHandle + '>')
-        myMessage = myMessage[:500]
+            if not sendMessage(connectionSocket, serverHandle):
+                print "Closing connection"
+                break
 
-        # check if the server wants to quit the connection
-        if myMessage == "\quit":
-            print "closing connection"
-            break
+        connectionSocket.close()
+        print "\nConnection terminated, still serving for chat\n"
 
-        # send the message to the client
-        myMessage = serverHandle + '>' + myMessage
-        connectionSocket.send(myMessage)
-
-    connectionSocket.close()
-    print "\nConnection terminated, still serving for chat\n"
+if __name__ == "__main__":
+    main(sys.argv[1:])
